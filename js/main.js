@@ -1185,4 +1185,348 @@ style.textContent = `
         border: 1px solid #0096ff;
     }
 `;
+
 document.head.appendChild(style);
+// Функция переключения режима отображения
+function initViewToggle() {
+    const toggleBtn = document.getElementById('view-toggle');
+    if (!toggleBtn) return;
+    
+    // Проверяем сохраненные настройки
+    const savedView = localStorage.getItem('productViewMode') || 'grid';
+    
+    // Применяем сохраненный режим
+    applyViewMode(savedView);
+    updateToggleButton(savedView);
+    
+    // Обработчик клика
+    toggleBtn.addEventListener('click', function() {
+        const currentView = document.body.classList.contains('compact-mode') ? 'compact' : 'grid';
+        const newView = currentView === 'grid' ? 'compact' : 'grid';
+        
+        applyViewMode(newView);
+        updateToggleButton(newView);
+        
+        // Сохраняем в localStorage
+        localStorage.setItem('productViewMode', newView);
+        
+        // Показываем уведомление
+        showNotification(`Режим: ${newView === 'compact' ? 'Компактный' : 'Стандартный'}`, 'info');
+    });
+}
+
+// Применение режима отображения
+function applyViewMode(mode) {
+    const productsGrids = document.querySelectorAll('.products-grid');
+    
+    // Удаляем все классы режимов
+    document.body.classList.remove('compact-mode', 'ultra-compact');
+    productsGrids.forEach(grid => grid.classList.remove('compact-mode'));
+    
+    if (mode === 'compact') {
+        document.body.classList.add('compact-mode');
+        productsGrids.forEach(grid => grid.classList.add('compact-mode'));
+    } else if (mode === 'ultra-compact') {
+        document.body.classList.add('ultra-compact');
+        productsGrids.forEach(grid => grid.classList.add('ultra-compact'));
+    }
+}
+
+// Обновление кнопки переключения
+function updateToggleButton(mode) {
+    const toggleBtn = document.getElementById('view-toggle');
+    if (!toggleBtn) return;
+    
+    const icon = toggleBtn.querySelector('i');
+    const text = toggleBtn.querySelector('span');
+    
+    if (mode === 'compact') {
+        icon.className = 'fas fa-th-large';
+        text.textContent = 'Сетка';
+        toggleBtn.classList.add('active');
+    } else {
+        icon.className = 'fas fa-list';
+        text.textContent = 'Список';
+        toggleBtn.classList.remove('active');
+    }
+}
+
+// Адаптивное изменение режима по ширине экрана
+function adaptiveViewMode() {
+    const width = window.innerWidth;
+    
+    if (width < 480) {
+        // Автоматически включаем компактный режим на очень маленьких экранах
+        if (!localStorage.getItem('productViewMode')) {
+            applyViewMode('compact');
+            updateToggleButton('compact');
+        }
+    }
+}
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    // Создаем кнопку переключения режима
+    const viewToggle = document.createElement('div');
+    viewToggle.className = 'view-toggle';
+    viewToggle.innerHTML = `
+        <button class="view-toggle-btn" id="view-toggle">
+            <i class="fas fa-list"></i>
+            <span>Список</span>
+        </button>
+    `;
+    
+    // Вставляем после каждого section-title
+    document.querySelectorAll('.section-title').forEach(title => {
+        const toggleClone = viewToggle.cloneNode(true);
+        title.parentNode.insertBefore(toggleClone, title.nextSibling);
+    });
+    
+    // Инициализируем переключатель
+    initViewToggle();
+    
+    // Адаптивный режим
+    adaptiveViewMode();
+    window.addEventListener('resize', adaptiveViewMode);
+    
+    // Создаем компактные карточки для адресов в профиле
+    createCompactAddressCards();
+    
+    // Создаем компактные карточки для заказов
+    createCompactOrderCards();
+});
+
+// Создание компактных карточек адресов
+function createCompactAddressCards() {
+    const addressesList = document.getElementById('addresses-list');
+    if (!addressesList) return;
+    
+    addressesList.classList.add('compact-addresses');
+}
+
+// Создание компактных карточек заказов
+function createCompactOrderCards() {
+    const ordersList = document.getElementById('history-orders-list');
+    if (ordersList) {
+        ordersList.classList.add('compact-orders');
+    }
+    
+    const activeOrdersList = document.getElementById('active-orders-list');
+    if (activeOrdersList) {
+        activeOrdersList.classList.add('compact-orders');
+    }
+}
+
+// Быстрый выбор адреса доставки
+function createQuickAddressSelector() {
+    const addressContainer = document.querySelector('.delivery-info');
+    if (!addressContainer) return;
+    
+    const quickSelector = document.createElement('div');
+    quickSelector.className = 'quick-addresses';
+    quickSelector.id = 'quick-address-selector';
+    
+    // Заглушка - в реальном приложении здесь будут данные из БД
+    const addresses = [
+        { id: 1, title: 'Дом', address: 'ул. Нагорная, 95', icon: 'fa-home' },
+        { id: 2, title: 'Работа', address: 'ул. Ленина, 12', icon: 'fa-briefcase' },
+        { id: 3, title: 'Другое', address: 'ул. Центральная, 45', icon: 'fa-map-marker-alt' }
+    ];
+    
+    addresses.forEach(addr => {
+        const addressItem = document.createElement('div');
+        addressItem.className = 'quick-address';
+        addressItem.dataset.id = addr.id;
+        addressItem.innerHTML = `
+            <div class="quick-address-icon">
+                <i class="fas ${addr.icon}"></i>
+            </div>
+            <div class="quick-address-title">${addr.title}</div>
+            <div class="quick-address-text">${addr.address}</div>
+        `;
+        
+        addressItem.addEventListener('click', function() {
+            // Убираем активный класс у всех
+            document.querySelectorAll('.quick-address').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Добавляем активный класс текущему
+            this.classList.add('active');
+            
+            // Обновляем адрес в корзине
+            document.getElementById('cart-delivery-address').textContent = addr.address;
+            
+            showNotification(`Выбран адрес: ${addr.title}`, 'success');
+        });
+        
+        quickSelector.appendChild(addressItem);
+    });
+    
+    addressContainer.parentNode.insertBefore(quickSelector, addressContainer);
+}
+
+// Создание быстрых действий в профиле
+function createQuickActions() {
+    const profileHeader = document.querySelector('.profile-info');
+    if (!profileHeader) return;
+    
+    const quickActions = document.createElement('div');
+    quickActions.className = 'quick-actions';
+    quickActions.innerHTML = `
+        <div class="quick-action" onclick="window.location.href='profile.html#orders-history'">
+            <div class="quick-action-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="quick-action-text">Заказы</div>
+        </div>
+        <div class="quick-action" onclick="window.location.href='profile.html#bonuses'">
+            <div class="quick-action-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div class="quick-action-text">Бонусы</div>
+        </div>
+        <div class="quick-action" onclick="window.location.href='profile.html#delivery-address'">
+            <div class="quick-action-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="quick-action-text">Адрес</div>
+        </div>
+    `;
+    
+    profileHeader.appendChild(quickActions);
+}
+
+// Горизонтальная прокрутка популярных товаров
+function createHorizontalScroll() {
+    const newProducts = document.getElementById('new-products');
+    if (!newProducts) return;
+    
+    // Добавляем горизонтальный скролл
+    const scrollContainer = document.createElement('div');
+    scrollContainer.className = 'horizontal-scroll';
+    scrollContainer.id = 'popular-scroll';
+    
+    // Клонируем первые 5 продуктов
+    const products = newProducts.querySelectorAll('.product-card');
+    products.forEach((product, index) => {
+        if (index < 5) {
+            const clone = product.cloneNode(true);
+            clone.classList.add('horizontal-scroll-item');
+            clone.classList.add('mini-card');
+            
+            // Упрощаем содержимое для мини-карточки
+            const img = clone.querySelector('.product-img');
+            const title = clone.querySelector('.product-title');
+            const price = clone.querySelector('.product-price');
+            
+            scrollContainer.appendChild(clone);
+        }
+    });
+    
+    // Заменяем оригинальный контейнер
+    newProducts.parentNode.insertBefore(scrollContainer, newProducts);
+    newProducts.style.display = 'none';
+}
+
+// Мини-карточки для быстрого добавления в корзину
+function createQuickAddMiniCards() {
+    const sectionTitles = document.querySelectorAll('.section-title');
+    
+    sectionTitles.forEach(title => {
+        if (title.textContent.includes('Новинки') || 
+            title.textContent.includes('Популярные')) {
+            
+            const miniGrid = document.createElement('div');
+            miniGrid.className = 'mini-grid';
+            miniGrid.id = 'mini-grid-' + Date.now();
+            
+            // Находим следующий products-grid
+            let nextSibling = title.nextElementSibling;
+            while (nextSibling && !nextSibling.classList.contains('products-grid')) {
+                nextSibling = nextSibling.nextElementSibling;
+            }
+            
+            if (nextSibling && nextSibling.classList.contains('products-grid')) {
+                // Берем первые 4 товара
+                const products = nextSibling.querySelectorAll('.product-card');
+                products.forEach((product, index) => {
+                    if (index < 4) {
+                        const miniCard = createMiniCard(product);
+                        miniGrid.appendChild(miniCard);
+                    }
+                });
+                
+                // Вставляем перед основным гридом
+                nextSibling.parentNode.insertBefore(miniGrid, nextSibling);
+                
+                // Добавляем переключатель
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'btn-black';
+                toggleBtn.style.marginTop = '10px';
+                toggleBtn.style.width = '100%';
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Показать все';
+                toggleBtn.addEventListener('click', function() {
+                    nextSibling.style.display = 
+                        nextSibling.style.display === 'none' ? 'grid' : 'none';
+                    this.innerHTML = nextSibling.style.display === 'none' ? 
+                        '<i class="fas fa-eye"></i> Показать все' : 
+                        '<i class="fas fa-eye-slash"></i> Скрыть';
+                });
+                
+                // Скрываем основной грид по умолчанию на мобильных
+                if (window.innerWidth < 768) {
+                    nextSibling.style.display = 'none';
+                }
+                
+                miniGrid.parentNode.insertBefore(toggleBtn, miniGrid.nextSibling);
+            }
+        }
+    });
+}
+
+// Создание мини-карточки
+function createMiniCard(productCard) {
+    const miniCard = document.createElement('div');
+    miniCard.className = 'mini-card';
+    
+    const img = productCard.querySelector('.product-img');
+    const title = productCard.querySelector('.product-title');
+    const price = productCard.querySelector('.product-price');
+    const addBtn = productCard.querySelector('.add-to-cart');
+    
+    miniCard.innerHTML = `
+        ${img ? `<img src="${img.src}" alt="${title.textContent}" class="mini-card-image">` : ''}
+        <div class="mini-card-title">${title ? title.textContent : ''}</div>
+        <div class="mini-card-price">${price ? price.textContent : ''}</div>
+    `;
+    
+    // Копируем обработчик добавления в корзину
+    if (addBtn) {
+        miniCard.addEventListener('click', function(e) {
+            if (!e.target.closest('.mini-card-price')) {
+                addBtn.click();
+            }
+        });
+    }
+    
+    return miniCard;
+}
+
+// Сжатый режим профиля для мобильных
+function initCompactProfile() {
+    if (window.innerWidth < 768) {
+        document.querySelector('.profile-main')?.classList.add('compact-profile');
+    }
+}
+
+// Инициализация всех компактных функций
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        createQuickAddressSelector();
+        createQuickActions();
+        createHorizontalScroll();
+        createQuickAddMiniCards();
+        initCompactProfile();
+    }, 1000);
+});
