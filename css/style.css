@@ -3821,4 +3821,697 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.9) inset !important;
     caret-color: white !important;
     transition: background-color 5000s ease-in-out 0s;
+
+}
+/* КОМПАКТНЫЕ КАРТОЧКИ ДЛЯ МОБИЛЬНЫХ */
+
+/* Компактный режим для сетки продуктов */
+.compact-grid .products-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.compact-grid .product-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #333;
+    gap: 12px;
+    transition: all 0.3s;
+    min-height: 100px;
+}
+
+.compact-grid .product-card:hover {
+    border-color: #ff0000;
+    transform: translateX(3px);
+}
+
+.compact-grid .product-img {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    border-radius: 8px;
+    border: none;
+    border-right: 2px solid #ff0000;
+}
+
+.compact-grid .product-info {
+    flex: 1;
+    padding: 0;
+    min-width: 0;
+}
+
+.compact-grid .product-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    min-height: auto;
+    line-height: 1.3;
+    color: white;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.compact-grid .product-desc {
+    display: none; /* Скрываем описание в компактном режиме */
+}
+
+.compact-grid .product-bottom {
+    border: none;
+    padding: 0;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.compact-grid .product-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ff0000;
+}
+
+.compact-grid .add-to-cart {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+}
+
+.compact-grid .product-rating {
+    display: none; /* Скрываем рейтинг в компактном режиме */
+}
+
+.compact-grid .product-card.new::before {
+    top: 5px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+}
+
+/* Варианты продуктов в компактном режиме */
+.compact-grid .product-variants {
+    margin: 5px 0;
+    display: none; /* По умолчанию скрываем */
+}
+
+.compact-grid .product-card:hover .product-variants,
+.compact-grid .product-card.active .product-variants {
+    display: block;
+}
+
+.compact-grid .variant-buttons {
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.compact-grid .variant-btn {
+    padding: 6px 8px;
+    font-size: 11px;
+    border-radius: 6px;
+    min-height: 32px;
+}
+
+.compact-grid .variant-price {
+    font-size: 14px;
+    padding: 6px;
+    margin: 6px 0;
+}
+
+/* Переключатель режима отображения */
+.view-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+.view-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #333;
+    color: #666;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    transition: all 0.3s;
+    touch-action: manipulation;
+}
+
+.view-toggle-btn:hover {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+    color: #ff0000;
+}
+
+.view-toggle-btn.active {
+    background: rgba(255, 0, 0, 0.2);
+    border-color: #ff0000;
+    color: #ff0000;
+}
+
+.view-toggle-btn i {
+    font-size: 14px;
+}
+
+/* Адаптация для очень маленьких экранов */
+@media (max-width: 320px) {
+    .compact-grid .product-card {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .compact-grid .product-img {
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+    }
+    
+    .compact-grid .product-title {
+        font-size: 13px;
+        -webkit-line-clamp: 1;
+    }
+    
+    .compact-grid .product-price {
+        font-size: 16px;
+    }
+}
+
+/* Компактные карточки для заказов */
+.compact-orders .order-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    gap: 12px;
+    background: rgba(51, 51, 51, 0.5);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #333;
+}
+
+.compact-orders .order-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff0000;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.compact-orders .order-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.compact-orders .order-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.compact-orders .order-details {
+    font-size: 12px;
+    color: #ccc;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.compact-orders .order-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ff0000;
+    white-space: nowrap;
+}
+
+.compact-orders .order-status {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: inline-block;
+}
+
+/* Компактные карточки адресов */
+.compact-addresses .address-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(51, 51, 51, 0.5);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #333;
+}
+
+.compact-addresses .address-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff0000;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.compact-addresses .address-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.compact-addresses .address-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.compact-addresses .address-text {
+    font-size: 12px;
+    color: #ccc;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.compact-addresses .address-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.compact-addresses .address-actions button {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #333;
+    color: #666;
+    min-height: 32px;
+}
+
+.compact-addresses .address-actions button:hover {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+    color: #ff0000;
+}
+
+/* Мини-карточки для быстрого выбора */
+.mini-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 10px;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.mini-card:hover {
+    border-color: #ff0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+}
+
+.mini-card-image {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #ff0000;
+}
+
+.mini-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 30px;
+}
+
+.mini-card-price {
+    font-size: 14px;
+    font-weight: 800;
+    color: #ff0000;
+    text-align: center;
+}
+
+.mini-card-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ff0000;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    z-index: 1;
+}
+
+/* Сетка для мини-карточек */
+.mini-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Горизонтальная прокрутка для мини-карточек */
+.horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 5px;
+    margin: 0 -5px 20px -5px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 0, 0, 0.5);
+    border-radius: 2px;
+}
+
+.horizontal-scroll-item {
+    flex: 0 0 auto;
+    width: 140px;
+}
+
+/* Быстрый выбор адреса */
+.quick-addresses {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.quick-address {
+    background: rgba(51, 51, 51, 0.5);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-address:hover {
+    border-color: #ff0000;
+    transform: translateY(-2px);
+}
+
+.quick-address.active {
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.1);
+}
+
+.quick-address-icon {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff0000;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.quick-address-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.quick-address-text {
+    font-size: 10px;
+    color: #ccc;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.quick-address-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ff0000;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+
+/* Быстрые действия */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.quick-action {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    touch-action: manipulation;
+}
+
+.quick-action:hover {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+    transform: translateY(-2px);
+}
+
+.quick-action-icon {
+    font-size: 20px;
+    color: #ff0000;
+    margin-bottom: 6px;
+}
+
+.quick-action-text {
+    font-size: 11px;
+    color: white;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* Сжатые карточки профиля */
+.compact-profile .profile-section-card {
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.compact-profile .section-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+}
+
+.compact-profile .section-header h3 {
+    font-size: 16px;
+}
+
+.compact-profile .section-content {
+    font-size: 13px;
+}
+
+.compact-profile .info-row {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.compact-profile .info-label {
+    min-width: 100px;
+    font-size: 12px;
+}
+
+.compact-profile .info-value {
+    font-size: 13px;
+}
+
+.compact-profile .form-group {
+    margin-bottom: 12px;
+}
+
+.compact-profile .form-group input,
+.compact-profile .form-group textarea,
+.compact-profile .form-group select {
+    padding: 12px;
+    font-size: 14px;
+}
+
+/* Кнопка переключения режима */
+@media (min-width: 769px) {
+    .view-toggle {
+        display: none;
+    }
+}
+
+/* JS классы для переключения */
+.compact-mode .products-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.compact-mode .product-card {
+    flex-direction: row;
+    padding: 12px;
+    align-items: center;
+    gap: 12px;
+}
+
+.compact-mode .product-img {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    border-radius: 8px;
+    border: none;
+    border-right: 2px solid #ff0000;
+}
+
+.compact-mode .product-info {
+    padding: 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.compact-mode .product-title {
+    font-size: 14px;
+    margin-bottom: 4px;
+    min-height: auto;
+    line-height: 1.3;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.compact-mode .product-desc {
+    display: none;
+}
+
+.compact-mode .product-bottom {
+    border: none;
+    padding: 0;
+    margin-top: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.compact-mode .product-price {
+    font-size: 16px;
+}
+
+.compact-mode .add-to-cart {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+}
+
+.compact-mode .product-rating {
+    display: none;
+}
+
+/* Дополнительные стили для ультра-компактного режима */
+.ultra-compact .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.ultra-compact .product-card {
+    flex-direction: column;
+    padding: 10px;
+    text-align: center;
+    gap: 8px;
+}
+
+.ultra-compact .product-img {
+    width: 100%;
+    height: 100px;
+    min-width: 100%;
+    border-radius: 8px;
+    border: none;
+    border-bottom: 2px solid #ff0000;
+}
+
+.ultra-compact .product-title {
+    font-size: 12px;
+    -webkit-line-clamp: 1;
+    height: 16px;
+}
+
+.ultra-compact .product-bottom {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ultra-compact .product-price {
+    font-size: 14px;
+}
+
+.ultra-compact .add-to-cart {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
 }
