@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель - Kсуши</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ff0000;
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #ff0000;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .admin-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+        
+        .btn-danger:hover {
+            background: rgba(255, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            border: 1px solid #ffa500;
+        }
+        
+        .btn-warning:hover {
+            background: rgba(255, 165, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: rgba(0, 150, 255, 0.1);
+            color: #0096ff;
+            border: 1px solid #0096ff;
+        }
+        
+        .btn-info:hover {
+            background: rgba(0, 150, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .stats {
+            background: rgba(51, 51, 51, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .stat-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #ff0000;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            border-color: #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10001;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification-success {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .notification-error {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1><i class="fas fa-cogs"></i> Админ-панель Kсуши</h1>
+        
+        <div class="admin-actions">
+            <button class="admin-btn btn-danger" id="clear-all-orders">
+                <i class="fas fa-trash"></i> Очистить ВСЕ заказы
+            </button>
+            
+            <button class="admin-btn btn-warning" id="clear-completed-orders">
+                <i class="fas fa-check-circle"></i> Очистить завершенные заказы
+            </button>
+            
+            <button class="admin-btn btn-info" id="clear-old-orders">
+                <i class="fas fa-clock"></i> Очистить заказы старше 1 дня
+            </button>
+            
+            <button class="admin-btn btn-info" id="reset-test-data">
+                <i class="fas fa-database"></i> Создать тестовые данные
+            </button>
+            
+            <button class="admin-btn btn-danger" id="clear-all-data">
+                <i class="fas fa-bomb"></i> Очистить ВСЕ данные (полный сброс)
+            </button>
+        </div>
+        
+        <div class="stats" id="stats-container">
+            <h3><i class="fas fa-chart-bar"></i> Статистика</h3>
+            <!-- Статистика будет загружена через JS -->
+        </div>
+        
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Вернуться на главную
+        </a>
+    </div>
+
+    <script>
+        // Функция для показа уведомлений
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                   type === 'error' ? 'exclamation-circle' : 
+                                   'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Функция для загрузки статистики
+        function loadStats() {
+            const users = JSON.parse(localStorage.getItem('ksushi_users')) || [];
+            const statsContainer = document.getElementById('stats-container');
+            
+            let totalUsers = users.length;
+            let totalOrders = 0;
+            let activeOrders = 0;
+            let completedOrders = 0;
+            
+            users.forEach(user => {
+                if (user.orders) {
+                    totalOrders += user.orders.length;
+                    user.orders.forEach(order => {
+                        if (order.status === 'delivered' || order.status === 'completed' || order.status === 'cancelled') {
+                            completedOrders++;
+                        } else {
+                            activeOrders++;
+                        }
+                    });
+                }
+            });
+            
+            statsContainer.innerHTML = `
+                <h3><i class="fas fa-chart-bar"></i> Статистика</h3>
+                <div class="stat-item">
+                    <span>Пользователей в системе:</span>
+                    <strong>${totalUsers}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Всего заказов:</span>
+                    <strong>${totalOrders}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Активных заказов:</span>
+                    <strong style="color: #ffa500;">${activeOrders}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Завершенных заказов:</span>
+                    <strong style="color: #00ff00;">${completedOrders}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Использовано памяти:</span>
+                    <strong>${(JSON.stringify(localStorage).length / 1024).toFixed(2)} KB</strong>
+                </div>
+            `;
+        }
+        
+        // Очистить все заказы
+        document.getElementById('clear-all-orders').addEventListener('click', function() {
+            if (!confirm('Вы уверены, что хотите удалить ВСЕ заказы у всех пользователей?')) {
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('ksushi_users')) || [];
+            let deletedOrders = 0;
+            
+            users.forEach(user => {
+                if (user.orders) {
+                    deletedOrders += user.orders.length;
+                    user.orders = [];
+                }
+            });
+            
+            localStorage.setItem('ksushi_users', JSON.stringify(users));
+            loadStats();
+            showNotification(`Удалено ${deletedOrders} заказов!`, 'success');
+        });
+        
+        // Очистить завершенные заказы
+        document.getElementById('clear-completed-orders').addEventListener('click', function() {
+            if (!confirm('Удалить все завершенные и отмененные заказы?')) {
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('ksushi_users')) || [];
+            let deletedCount = 0;
+            
+            users.forEach(user => {
+                if (user.orders) {
+                    const originalLength = user.orders.length;
+                    user.orders = user.orders.filter(order => 
+                        order.status !== 'delivered' && 
+                        order.status !== 'completed' && 
+                        order.status !== 'cancelled'
+                    );
+                    deletedCount += (originalLength - user.orders.length);
+                }
+            });
+            
+            localStorage.setItem('ksushi_users', JSON.stringify(users));
+            loadStats();
+            showNotification(`Удалено ${deletedCount} завершенных заказов!`, 'success');
+        });
+        
+        // Очистить старые заказы (старше 1 дня)
+        document.getElementById('clear-old-orders').addEventListener('click', function() {
+            const oneDayAgo = new Date();
+            oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+            
+            const users = JSON.parse(localStorage.getItem('ksushi_users')) || [];
+            let deletedCount = 0;
+            
+            users.forEach(user => {
+                if (user.orders) {
+                    const originalLength = user.orders.length;
+                    user.orders = user.orders.filter(order => {
+                        const orderDate = new Date(order.date);
+                        return orderDate > oneDayAgo;
+                    });
+                    deletedCount += (originalLength - user.orders.length);
+                }
+            });
+            
+            localStorage.setItem('ksushi_users', JSON.stringify(users));
+            loadStats();
+            showNotification(`Удалено ${deletedCount} старых заказов!`, 'success');
+        });
+        
+        // Создать тестовые данные
+        document.getElementById('reset-test-data').addEventListener('click', function() {
+            if (!confirm('Создать тестовые данные? Существующие данные будут сохранены.')) {
+                return;
+            }
+            
+            // Создаем тестового пользователя
+            const testUser = {
+                phone: '9991234567',
+                name: 'Тестовый Клиент',
+                email: 'test@example.com',
+                addresses: [{
+                    id: 1,
+                    title: 'Дом',
+                    fullAddress: 'г. Москва, ул. Тестовая, д. 1, кв. 1',
+                    city: 'Москва',
+                    street: 'Тестовая',
+                    house: '1',
+                    apartment: '1',
+                    isDefault: true,
+                    createdAt: new Date().toISOString()
+                }],
+                orders: [
+                    {
+                        id: 'ORD' + Date.now(),
+                        date: new Date().toISOString(),
+                        items: [
+                            { id: 1, name: 'Ролл Филадельфия Black Edition', price: 420, quantity: 2 },
+                            { id: 2, name: 'Красный Дракон', price: 380, quantity: 1 }
+                        ],
+                        total: 1220,
+                        address: {
+                            title: 'Дом',
+                            fullAddress: 'г. Москва, ул. Тестовая, д. 1, кв. 1'
+                        },
+                        status: 'new',
+                        paymentMethod: 'cash',
+                        userName: 'Тестовый Клиент',
+                        userPhone: '9991234567'
+                    },
+                    {
+                        id: 'ORD' + (Date.now() - 10000),
+                        date: new Date(Date.now() - 86400000).toISOString(), // Вчера
+                        items: [
+                            { id: 3, name: 'Черный Самурай', price: 560, quantity: 1 }
+                        ],
+                        total: 560,
+                        address: {
+                            title: 'Дом',
+                            fullAddress: 'г. Москва, ул. Тестовая, д. 1, кв. 1'
+                        },
+                        status: 'delivered',
+                        paymentMethod: 'cash',
+                        userName: 'Тестовый Клиент',
+                        userPhone: '9991234567'
+                    }
+                ],
+                bonuses: 100,
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
+            };
+            
+            // Добавляем пользователя
+            let users = JSON.parse(localStorage.getItem('ksushi_users')) || [];
+            const existingIndex = users.findIndex(u => u.phone === testUser.phone);
+            
+            if (existingIndex !== -1) {
+                users[existingIndex] = testUser;
+            } else {
+                users.push(testUser);
+            }
+            
+            localStorage.setItem('ksushi_users', JSON.stringify(users));
+            loadStats();
+            showNotification('Тестовые данные созданы!', 'success');
+        });
+        
+        // Очистить ВСЕ данные
+        document.getElementById('clear-all-data').addEventListener('click', function() {
+            if (!confirm('ВНИМАНИЕ! Это удалит ВСЕ данные: заказы, пользователей, корзины. Продолжить?')) {
+                return;
+            }
+            
+            localStorage.clear();
+            loadStats();
+            showNotification('Все данные очищены!', 'success');
+        });
+        
+        // Загружаем статистику при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadStats);
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
