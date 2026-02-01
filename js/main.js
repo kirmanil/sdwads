@@ -162,6 +162,29 @@ const products = {
     ]
 };
 
+let products = {};
+let promoCodes = {};
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let activePromo = localStorage.getItem('activePromo') || null;
+let usedBonuses = parseInt(localStorage.getItem('usedBonuses')) || 0;
+let deliveryPrice = 0;
+
+// Функция для открытия авторизации
+function openAuthModal() {
+    if (window.smsAuth && window.smsAuth.openAuthModal) {
+        window.smsAuth.openAuthModal();
+    } else {
+        // Если smsAuth не загружен, покажем fallback
+        showNotification('Модуль авторизации загружается...', 'info');
+        // Перезагружаем страницу через 2 секунды если не загрузился
+        setTimeout(() => {
+            if (!window.smsAuth) {
+                showNotification('Пожалуйста, обновите страницу', 'error');
+            }
+        }, 2000);
+    }
+}
+
 // Корзина
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -1794,3 +1817,4 @@ function optimizeImages() {
 // Инициализация оптимизации изображений
 document.addEventListener('DOMContentLoaded', optimizeImages);
 window.addEventListener('resize', optimizeImages);
+
