@@ -1530,3 +1530,267 @@ document.addEventListener('DOMContentLoaded', function() {
         initCompactProfile();
     }, 1000);
 });
+// Управление видами отображения карточек
+class ProductViewManager {
+    constructor() {
+        this.viewMode = localStorage.getItem('productViewMode') || 'grid';
+        this.init();
+    }
+    
+    init() {
+        this.createViewControls();
+        this.applyViewMode(this.viewMode);
+        this.setupEventListeners();
+    }
+    
+    createViewControls() {
+        // Создаем контейнер для кнопок переключения вида
+        const controls = document.createElement('div');
+        controls.className = 'view-controls';
+        controls.innerHTML = `
+            <button class="view-btn" data-view="grid" title="Сетка 2x2">
+                <i class="fas fa-th-large"></i>
+            </button>
+            <button class="view-btn" data-view="list" title="Список">
+                <i class="fas fa-list"></i>
+            </button>
+            <button class="view-btn" data-view="tile" title="Плитка">
+                <i class="fas fa-th"></i>
+            </button>
+        `;
+        
+        // Вставляем перед первым разделом
+        const firstSection = document.querySelector('.section-header');
+        if (firstSection) {
+            firstSection.parentNode.insertBefore(controls, firstSection.nextSibling);
+        }
+        
+        this.controls = controls;
+    }
+    
+    applyViewMode(mode) {
+        this.viewMode = mode;
+        
+        // Удаляем все классы видов
+        document.body.classList.remove('grid-view', 'list-view', 'tile-view');
+        
+        // Добавляем нужный класс
+        document.body.classList.add(`${mode}-view`);
+        
+        // Обновляем активную кнопку
+        this.updateActiveButton(mode);
+        
+        // Сохраняем настройки
+        localStorage.setItem('productViewMode', mode);
+    }
+    
+    updateActiveButton(mode) {
+        if (!this.controls) return;
+        
+        // Убираем активный класс у всех кнопок
+        this.controls.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Добавляем активный класс выбранной кнопке
+        const activeBtn = this.controls.querySelector(`[data-view="${mode}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+    }
+    
+    setupEventListeners() {
+        if (!this.controls) return;
+        
+        // Обработчики кликов по кнопкам
+        this.controls.addEventListener('click', (e) => {
+            const btn = e.target.closest('.view-btn');
+            if (!btn) return;
+            
+            const view = btn.dataset.view;
+            this.applyViewMode(view);
+            
+            // Показываем уведомление
+            this.showViewNotification(view);
+        });
+        
+        // Адаптивное изменение вида при изменении размера окна
+        window.addEventListener('resize', () => {
+            this.adaptiveViewMode();
+        });
+        
+        // Инициализируем адаптивный режим
+        this.adaptiveViewMode();
+    }
+    
+    showViewNotification(view) {
+        const messages = {
+            'grid': 'Режим: Сетка (2 в ряд)',
+            'list': 'Режим: Список',
+            'tile': 'Режим: Компактная плитка'
+        };
+        
+        showNotification(messages[view], 'info');
+    }
+    
+    adaptiveViewMode() {
+        const width = window.innerWidth;
+        
+        // Автоматически переключаем на список на очень узких экранах
+        if (width < 360 && this.viewMode !== 'list') {
+            this.applyViewMode('list');
+        }
+    }
+}
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    // Инициализируем менеджер видов
+    if (document.querySelector('.products-grid')) {
+        window.viewManager = new ProductViewManager();
+    }
+    
+    // Оптимизация карточек для мобильных
+    optimizeForMobile();
+    
+    // Скелетоны для загрузки
+    showSkeletons();
+});
+
+// Оптимизация для мобильных
+function optimizeForMobile() {
+    if (window.innerWidth > 768) return;
+    
+    // Упрощаем карточки на мобильных
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(card => {
+        // Добавляем класс для оптимизации
+        card.classList.add('mobile-optimized');
+        
+        // Упрощаем описание (ограничиваем строки)
+        const desc = card.querySelector('.product-desc');
+        if (desc) {
+            desc.style.webkitLineClamp = '2';
+        }
+        
+        // Добавляем быстрый просмотр
+        card.addEventListener('click', (e) => {
+            // Не срабатывает при клике на кнопки
+            if (e.target.closest('.add-to-cart') || 
+                e.target.closest('.variant-btn')) {
+                return;
+            }
+            
+            // Показываем быстрый просмотр
+            showQuickView(card);
+        });
+    });
+}
+
+// Показать быстрый просмотр
+function showQuickView(card) {
+    const productId = card.dataset.id;
+    const title = card.querySelector('.product-title')?.textContent;
+    const price = card.querySelector('.product-price')?.textContent;
+    const image = card.querySelector('.product-img')?.src;
+    
+    // Создаем модальное окно быстрого просмотра
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+        <div class="modal quick-view-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Быстрый просмотр</h3>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-content">
+                <img src="${image}" alt="${title}" class="quick-view-modal-image">
+                <h4>${title}</h4>
+                <div class="quick-view-price">${price}</div>
+                <button class="btn-red quick-view-add-btn" style="width: 100%; margin-top: 15px;">
+                    <i class="fas fa-cart-plus"></i> Добавить в корзину
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Закрытие модального окна
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+    
+    // Добавление в корзину
+    modal.querySelector('.quick-view-add-btn').addEventListener('click', () => {
+        // Здесь логика добавления в корзину
+        showNotification('Товар добавлен в корзину', 'success');
+        modal.remove();
+    });
+}
+
+// Показать скелетоны при загрузке
+function showSkeletons() {
+    const grids = document.querySelectorAll('.products-grid');
+    
+    grids.forEach(grid => {
+        // Проверяем, пустая ли сетка
+        if (grid.children.length === 0) {
+            grid.innerHTML = `
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                    <div class="skeleton-price"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                    <div class="skeleton-price"></div>
+                </div>
+            `.repeat(4); // 2 ряда по 2 карточки
+        }
+    });
+    
+    // Убираем скелетоны через 2 секунды (имитация загрузки)
+    setTimeout(() => {
+        document.querySelectorAll('.skeleton-card').forEach(skeleton => {
+            skeleton.style.opacity = '0';
+            setTimeout(() => skeleton.remove(), 300);
+        });
+    }, 2000);
+}
+
+// Оптимизация изображений
+function optimizeImages() {
+    const images = document.querySelectorAll('.product-img');
+    
+    images.forEach(img => {
+        // Добавляем lazy loading
+        img.loading = 'lazy';
+        
+        // Добавляем класс для анимации загрузки
+        if (!img.complete) {
+            img.classList.add('lazy-image');
+            img.onload = () => img.classList.remove('lazy-image');
+        }
+        
+        // Оптимизируем размеры для мобильных
+        if (window.innerWidth < 768) {
+            const src = img.src;
+            // Здесь можно добавить логику для загрузки оптимизированных изображений
+            // Например: img.src = src.replace('.jpg', '-mobile.jpg');
+        }
+    });
+}
+
+// Инициализация оптимизации изображений
+document.addEventListener('DOMContentLoaded', optimizeImages);
+window.addEventListener('resize', optimizeImages);
