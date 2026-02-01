@@ -4515,3 +4515,111 @@ input:-webkit-autofill:active {
     height: 32px;
     margin: 0 auto;
 }
+/* УЛЬТРА-КОМПАКТНЫЕ КАРТОЧКИ */
+.ultra-compact-card {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 10px;
+    border: 1px solid #333;
+    margin-bottom: 6px;
+    gap: 8px;
+    min-height: 70px;
+    position: relative;
+}
+
+.ultra-compact-card .product-img {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid #ff0000;
+}
+
+.ultra-compact-card .product-info {
+    flex: 1;
+    padding: 0;
+    min-width: 0;
+}
+
+.ultra-compact-card .product-title {
+    font-size: 12px;
+    margin-bottom: 4px;
+    line-height: 1.2;
+    color: white;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ultra-compact-card .product-price {
+    font-size: 14px;
+    font-weight: 800;
+    color: #ff0000;
+}
+
+.ultra-compact-card .add-to-cart {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    background: #ff0000;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+/* Списочный вид */
+.list-view .product-card {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 8px;
+    border-left: 4px solid #ff0000;
+}
+
+.list-view .product-img {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 6px;
+    margin-right: 12px;
+    border: none;
+}
+
+.list-view .product-info {
+    flex: 1;
+    padding: 0;
+}
+
+.list-view .product-title {
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: white;
+    line-height: 1.2;
+}
+
+.list-view .product-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff0000;
+}
+
+.list-view .add-to-cart {
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+}
+
