@@ -171,17 +171,14 @@ let deliveryPrice = 0;
 
 // Функция для открытия авторизации
 function openAuthModal() {
-    if (window.smsAuth && window.smsAuth.openAuthModal) {
+    if (window.openAuthModal) {
+        // Используем функцию из main.js
+        window.openAuthModal();
+    } else if (window.smsAuth && window.smsAuth.openAuthModal) {
         window.smsAuth.openAuthModal();
     } else {
-        // Если smsAuth не загружен, покажем fallback
-        showNotification('Модуль авторизации загружается...', 'info');
-        // Перезагружаем страницу через 2 секунды если не загрузился
-        setTimeout(() => {
-            if (!window.smsAuth) {
-                showNotification('Пожалуйста, обновите страницу', 'error');
-            }
-        }, 2000);
+        // Fallback
+        showNotification('Авторизация временно недоступна', 'error');
     }
 }
 
@@ -189,7 +186,10 @@ function openAuthModal() {
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 // Инициализация
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    // Загружаем данные из базы
+    await loadDataFromDatabase();
+    
     initBannerSlider();
     loadProducts();
     updateCartCount();
@@ -205,9 +205,52 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обновляем адрес в корзине из профиля
     updateCartAddressFromProfile();
     
-    // Инициализируем кнопку оформления заказа
-    initCheckoutButton();
+    // Инициализация промокодов и бонусов
+    updateAvailableBonuses();
+    updateActivePromoDisplay();
+    updatePricing();
+    
+    // Загрузка сохраненных промокодов и бонусов
+    loadSavedPromoAndBonuses();
+    
+    // Установка обработчиков событий
+    setupPromoHandlers();
+    setupBonusesHandlers();
+    
+    // Настраиваем обработчики для кнопок входа
+    setupAuthButtons();
+    
+    // Показываем подсказку о промокоде
+    setTimeout(showPromoHint, 1000);
 });
+// Настройка кнопок авторизации
+function setupAuthButtons() {
+    // Кнопка входа в шапке
+    const authBtn = document.getElementById('open-auth');
+    if (authBtn) {
+        authBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            openAuthModal();
+        });
+    }
+    
+    // Кнопка входа из корзины (если пользователь не авторизован)
+    const openAuthFromCart = document.getElementById('open-auth-from-cart');
+    if (openAuthFromCart) {
+        openAuthFromCart.addEventListener('click', function(e) {
+            e.preventDefault();
+            openAuthModal();
+        });
+    }
+    
+    // Кнопки входа на других страницах
+    document.querySelectorAll('.auth-btn, .login-btn, [data-action="login"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            openAuthModal();
+        });
+    });
+}
 function initCheckoutButton() {
     const orderBtn = document.querySelector('.btn-order');
     if (orderBtn) {
@@ -949,7 +992,7 @@ function updateAuthButton() {
             if (profileBadge) {
                 if (user.bonuses && user.bonuses > 0) {
                     profileBadge.textContent = user.bonuses;
-                    profileBadge.style.display = 'block';
+                    profileBadge.style.display = 'flex';
                 } else {
                     profileBadge.style.display = 'none';
                 }
@@ -961,6 +1004,19 @@ function updateAuthButton() {
             
             // Обновляем title для подсказки
             profileLink.title = `Профиль: ${user.name || 'Пользователь'}`;
+            
+            // Проверяем, нужно ли сбросить промокод KSUSHI20
+            if (activePromo === 'KSUSHI20') {
+                const usedPromos = JSON.parse(localStorage.getItem('usedPromos') || '{}');
+                if (usedPromos[user.phone]?.includes('KSUSHI20')) {
+                    // Пользователь уже использовал этот промокод
+                    activePromo = null;
+                    updateActivePromoDisplay();
+                    updatePricing();
+                    updateLocalStorage();
+                    showNotification('Вы уже использовали промокод KSUSHI20', 'info');
+                }
+            }
             
         } catch (e) {
             console.error('Ошибка парсинга userData:', e);
@@ -1057,6 +1113,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // updateAuthButton();
 
 // Обновление адреса в корзине из профиля
+// Обновление адреса в корзине из профиля
 function updateCartAddressFromProfile() {
     const userData = localStorage.getItem('userData');
     const addressElement = document.getElementById('cart-delivery-address');
@@ -1088,6 +1145,12 @@ function updateCartAddressFromProfile() {
             addressElement.innerHTML = '<a href="profile.html">Добавить адрес доставки</a>';
             addressElement.classList.add('address-notice');
         }
+    } else {
+        // Пользователь не авторизован
+        addressElement.innerHTML = '<a href="#" id="open-auth-from-cart">Войдите для выбора адреса</a>';
+        addressElement.classList.add('address-notice');
+    }
+}
     } else {
         // Пользователь не авторизован
         addressElement.innerHTML = '<a href="#" id="open-auth-from-cart">Войдите для выбора адреса</a>';
@@ -1817,4 +1880,5 @@ function optimizeImages() {
 // Инициализация оптимизации изображений
 document.addEventListener('DOMContentLoaded', optimizeImages);
 window.addEventListener('resize', optimizeImages);
+
 
