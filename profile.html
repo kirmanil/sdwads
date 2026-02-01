@@ -476,5 +476,75 @@
     <script src="js/main.js"></script>
     <script src="js/profile.js"></script>
     <script src="js/yandex-maps.js"></script>
+    <style>
+/* Дополнительные стили для профиля */
+@media (max-width: 768px) {
+    .profile-section-card {
+        margin-bottom: 15px;
+    }
+    
+    .address-details-grid,
+    .address-extra-details {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    
+    .section-content {
+        font-size: 13px;
+    }
+    
+    /* Компактная форма адреса */
+    .new-address-form .form-group {
+        margin-bottom: 12px;
+    }
+    
+    .new-address-form input,
+    .new-address-form textarea {
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    /* Быстрый выбор адреса */
+    .quick-addresses {
+        grid-template-columns: repeat(2, 1fr);
+        margin: 10px 0;
+    }
+}
+</style>
+
+<script>
+// Компактный режим для профиля
+if (window.innerWidth < 768) {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Создаем компактные карточки адресов
+        const addressesList = document.getElementById('addresses-list');
+        if (addressesList) {
+            addressesList.classList.add('compact-addresses');
+        }
+        
+        // Создаем компактные карточки заказов
+        const ordersList = document.getElementById('history-orders-list');
+        if (ordersList) {
+            ordersList.classList.add('compact-orders');
+        }
+        
+        // Упрощаем заголовки разделов
+        document.querySelectorAll('.section-header h3').forEach(h3 => {
+            if (h3.textContent.includes('Личные данные')) {
+                h3.textContent = 'Профиль';
+            } else if (h3.textContent.includes('Адрес доставки')) {
+                h3.textContent = 'Адреса';
+            } else if (h3.textContent.includes('Мои заказы')) {
+                h3.textContent = 'Заказы';
+            } else if (h3.textContent.includes('Бонусы и промокоды')) {
+                h3.textContent = 'Бонусы';
+            } else if (h3.textContent.includes('Настройки уведомлений')) {
+                h3.textContent = 'Настройки';
+            }
+        });
+    });
+}
+</script>
 </body>
+
 </html>
