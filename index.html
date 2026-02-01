@@ -429,5 +429,39 @@
         });
     });
     </script>
+    <script>
+// Инициализация компактного режима при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    // Автоматически включаем компактный режим на мобильных
+    if (window.innerWidth < 768) {
+        document.body.classList.add('compact-mode');
+    }
+    
+    // Обработка нажатий на мини-карточки
+    document.addEventListener('click', function(e) {
+        const miniCard = e.target.closest('.mini-card');
+        if (miniCard) {
+            e.preventDefault();
+            // Симулируем добавление в корзину
+            showNotification('Товар добавлен в корзину', 'success');
+            
+            // Анимация добавления
+            miniCard.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                miniCard.style.transform = '';
+            }, 200);
+        }
+        
+        const quickAction = e.target.closest('.quick-action');
+        if (quickAction) {
+            quickAction.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                quickAction.style.transform = '';
+            }, 200);
+        }
+    });
+});
+</script>
 </body>
+
 </html>
