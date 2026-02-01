@@ -5504,3 +5504,84 @@ input:-webkit-autofill:active {
         flex: 0 0 calc(25% - 8px);
     }
 }
+/* УЛЬТРА-КОМПАКТНЫЙ РЕЖИМ (4 в ряд на десктопе) */
+
+/* На мобильных остается 2 в ряд */
+@media (max-width: 768px) {
+    .ultra-compact .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ultra-compact .product-img {
+        height: 100px;
+    }
+    
+    .ultra-compact .product-title {
+        font-size: 12px;
+        min-height: 28px;
+        -webkit-line-clamp: 2;
+    }
+    
+    .ultra-compact .product-desc {
+        font-size: 10px;
+        min-height: 24px;
+        -webkit-line-clamp: 2;
+    }
+    
+    .ultra-compact .product-price {
+        font-size: 14px;
+    }
+    
+    .ultra-compact .add-to-cart {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+}
+
+/* На планшетах 3 в ряд */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .ultra-compact .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* На десктопах 4 в ряд */
+@media (min-width: 1025px) {
+    .ultra-compact .products-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+    
+    .ultra-compact .product-img {
+        height: 120px;
+    }
+    
+    .ultra-compact .product-title {
+        font-size: 13px;
+        min-height: 32px;
+    }
+    
+    .ultra-compact .product-desc {
+        font-size: 11px;
+        min-height: 28px;
+    }
+}
+
+/* Режим "только иконки" для быстрого выбора */
+.icon-view .products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.icon-view .product-card {
+    padding: 8px;
+    text-align: center;
+}
+
+.icon-view .product-img {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+
